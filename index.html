@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Galería de Imágenes · La Boutique de Luz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --rose:     #e8b4b8;
+      --rose-deep:#c47c82;
+      --cream:    #fdf8f5;
+      --warm:     #f5ede6;
+      --ink:      #2a1f1f;
+      --muted:    #8c7b7b;
+      --card:     #ffffff;
+      --shadow:   0 4px 24px rgba(42,31,31,0.08);
+      --radius:   14px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--ink);
+      padding: 22px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.25);
+    }
+    header h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: var(--rose);
+      letter-spacing: 0.04em;
+    }
+    header h1 span { color: #fff; font-weight: 400; }
+    #conteo {
+      font-size: 0.78rem;
+      color: var(--muted);
+      background: rgba(255,255,255,0.07);
+      padding: 5px 12px;
+      border-radius: 20px;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── TOOLBAR ── */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding: 20px 32px 0;
+    }
+    .search-wrap {
+      flex: 1;
+      min-width: 200px;
+      position: relative;
+    }
+    .search-wrap input {
+      width: 100%;
+      padding: 10px 16px 10px 38px;
+      border: 1.5px solid #e4d8d3;
+      border-radius: 30px;
+      background: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      color: var(--ink);
+      outline: none;
+      transition: border-color .2s;
+    }
+    .search-wrap input:focus { border-color: var(--rose-deep); }
+    .search-wrap svg {
+      position: absolute;
+      left: 12px; top: 50%;
+      transform: translateY(-50%);
+      opacity: .4;
+    }
+    .btn-ocultas {
+      padding: 10px 18px;
+      border-radius: 30px;
+      border: 1.5px solid #e4d8d3;
+      background: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .2s;
+      white-space: nowrap;
+    }
+    .btn-ocultas:hover { border-color: var(--rose-deep); color: var(--rose-deep); }
+    .btn-ocultas.activo { background: var(--rose); border-color: var(--rose); color: var(--ink); }
+
+    /* ── GRID ── */
+    .grid-wrap { padding: 24px 32px 48px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: transform .22s, box-shadow .22s, opacity .22s;
+      position: relative;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 36px rgba(42,31,31,0.14);
+    }
+    .card.oculta {
+      opacity: .35;
+      transform: none !important;
+    }
+
+    /* imagen */
+    .card-img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      display: block;
+      background: var(--warm);
+    }
+
+    /* nombre */
+    .card-nombre {
+      padding: 8px 10px 4px;
+      font-size: 0.72rem;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* acciones */
+    .card-acciones {
+      display: flex;
+      gap: 6px;
+      padding: 6px 10px 10px;
+    }
+    .btn-copiar, .btn-ocultar {
+      flex: 1;
+      padding: 7px 6px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 500;
+      transition: all .18s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+    .btn-copiar {
+      background: var(--rose);
+      color: var(--ink);
+    }
+    .btn-copiar:hover { background: var(--rose-deep); color: #fff; }
+    .btn-copiar.copiado { background: #7bc67e; color: #fff; }
+
+    .btn-ocultar {
+      background: var(--warm);
+      color: var(--muted);
+    }
+    .btn-ocultar:hover { background: #f0e0e0; color: var(--rose-deep); }
+    .card.oculta .btn-ocultar {
+      background: #f0e0e0;
+      color: var(--rose-deep);
+    }
+
+    /* badge oculta */
+    .badge-oculta {
+      position: absolute;
+      top: 8px; right: 8px;
+      background: rgba(42,31,31,0.7);
+      color: #fff;
+      font-size: 0.65rem;
+      padding: 2px 8px;
+      border-radius: 20px;
+      display: none;
+    }
+    .card.oculta .badge-oculta { display: block; }
+
+    /* ── EMPTY ── */
+    #vacio {
+      display: none;
+      text-align: center;
+      padding: 80px 20px;
+    }
+    #vacio svg { opacity: .2; margin-bottom: 16px; }
+    #vacio p { color: var(--muted); font-size: 0.95rem; }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed;
+      bottom: 28px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--ink);
+      color: #fff;
+      padding: 10px 22px;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      opacity: 0;
+      transition: all .3s;
+      pointer-events: none;
+      z-index: 999;
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── LOADING ── */
+    #loading {
+      text-align: center;
+      padding: 80px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid #e4d8d3;
+      border-top-color: var(--rose-deep);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 600px) {
+      header { padding: 16px 18px; }
+      .toolbar, .grid-wrap { padding-left: 16px; padding-right: 16px; }
+      .grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>✦ La Boutique <span>de Luz</span></h1>
+  <div id="conteo">Cargando…</div>
+</header>
+
+<div class="toolbar">
+  <div class="search-wrap">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2a1f1f" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" id="buscar" placeholder="Buscar imagen por nombre…" />
+  </div>
+  <button class="btn-ocultas" id="btnVerOcultas">👁 Mostrar ocultas</button>
+</div>
+
+<div class="grid-wrap">
+  <div id="loading"><div class="spinner"></div>Cargando imágenes…</div>
+  <div class="grid" id="grid"></div>
+  <div id="vacio">
+    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+    <p>No se encontraron imágenes.</p>
+  </div>
+</div>
+
+<div id="toast">✓ Link copiado</div>
+
+<script>
+  // ══════════════════════════════════════════════
+  // CONFIGURACIÓN — cambia solo esto
+  // ══════════════════════════════════════════════
+  const REPO_BASE_URL = ""; // Se detecta automáticamente en Cloudflare Pages
+  // Si quieres forzarlo pon tu URL: "https://tu-proyecto.pages.dev"
+  // ══════════════════════════════════════════════
+
+  const BASE = REPO_BASE_URL || window.location.origin;
+  const CARPETA = "imagenes";
+  const STORAGE_KEY = "boutique_ocultas_v1";
+
+  let todasLasImagenes = [];
+  let ocultas = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"));
+  let verOcultas = false;
+
+  const grid = document.getElementById("grid");
+  const conteo = document.getElementById("conteo");
+  const buscar = document.getElementById("buscar");
+  const btnVerOcultas = document.getElementById("btnVerOcultas");
+  const vacio = document.getElementById("vacio");
+  const loading = document.getElementById("loading");
+  const toast = document.getElementById("toast");
+
+  // ── Cargar manifest ──
+  async function cargarImagenes() {
+    try {
+      const res = await fetch(`${BASE}/imagenes.json?t=${Date.now()}`);
+      if (!res.ok) throw new Error("No se encontró imagenes.json");
+      todasLasImagenes = await res.json();
+      loading.style.display = "none";
+      renderizar();
+    } catch (e) {
+      loading.innerHTML = `<p style="color:#c47c82">⚠️ No se pudo cargar el manifest.<br><small>${e.message}</small></p>`;
+    }
+  }
+
+  // ── Renderizar grid ──
+  function renderizar() {
+    const q = buscar.value.trim().toLowerCase();
+    const lista = todasLasImagenes.filter(nombre => {
+      const matchBusqueda = nombre.toLowerCase().includes(q);
+      const esOculta = ocultas.has(nombre);
+      return matchBusqueda && (verOcultas ? true : !esOculta);
+    });
+
+    grid.innerHTML = "";
+    vacio.style.display = lista.length === 0 ? "block" : "none";
+
+    const visibles = todasLasImagenes.filter(n => !ocultas.has(n)).length;
+    conteo.textContent = `${visibles} imagen${visibles !== 1 ? "es" : ""}`;
+
+    lista.forEach((nombre, i) => {
+      const url = `${BASE}/${CARPETA}/${nombre}`;
+      const esOculta = ocultas.has(nombre);
+
+      const card = document.createElement("div");
+      card.className = "card" + (esOculta ? " oculta" : "");
+      card.style.animationDelay = `${i * 0.03}s`;
+
+      card.innerHTML = `
+        <img class="card-img" src="${url}" alt="${nombre}" loading="lazy" />
+        <span class="badge-oculta">Oculta</span>
+        <div class="card-nombre" title="${nombre}">${nombre}</div>
+        <div class="card-acciones">
+          <button class="btn-copiar" data-url="${url}">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copiar link
+          </button>
+          <button class="btn-ocultar" data-nombre="${nombre}">
+            ${esOculta
+              ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Mostrar`
+              : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg> Ocultar`
+            }
+          </button>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+
+    // Eventos
+    grid.querySelectorAll(".btn-copiar").forEach(btn => {
+      btn.addEventListener("click", () => {
+        navigator.clipboard.writeText(btn.dataset.url).then(() => {
+          btn.classList.add("copiado");
+          btn.textContent = "✓ Copiado!";
+          mostrarToast("Link copiado al portapapeles");
+          setTimeout(() => {
+            btn.classList.remove("copiado");
+            btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar link`;
+          }, 2000);
+        });
+      });
+    });
+
+    grid.querySelectorAll(".btn-ocultar").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const nombre = btn.dataset.nombre;
+        if (ocultas.has(nombre)) {
+          ocultas.delete(nombre);
+        } else {
+          ocultas.add(nombre);
+        }
+        localStorage.setItem(STORAGE_KEY, JSON.stringify([...ocultas]));
+        renderizar();
+      });
+    });
+  }
+
+  function mostrarToast(msg) {
+    toast.textContent = "✓ " + msg;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 2200);
+  }
+
+  buscar.addEventListener("input", renderizar);
+
+  btnVerOcultas.addEventListener("click", () => {
+    verOcultas = !verOcultas;
+    btnVerOcultas.classList.toggle("activo", verOcultas);
+    btnVerOcultas.textContent = verOcultas ? "🙈 Ocultar ocultas" : "👁 Mostrar ocultas";
+    renderizar();
+  });
+
+  cargarImagenes();
+</script>
+</body>
+</html>
