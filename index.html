@@ -242,6 +242,43 @@
       margin: 0 auto 16px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeIn { from { opacity:0; transform:scale(.96) } to { opacity:1; transform:scale(1) } }
+
+    /* ── LIGHTBOX ── */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(20,12,12,0.92);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: zoom-out;
+      animation: fadeIn .2s ease;
+    }
+    .lightbox img {
+      max-width: 92vw;
+      max-height: 90vh;
+      object-fit: contain;
+      border-radius: 10px;
+      box-shadow: 0 12px 60px rgba(0,0,0,0.6);
+      animation: fadeIn .25s ease;
+    }
+    .lightbox-cerrar {
+      position: absolute;
+      top: 18px; right: 22px;
+      background: rgba(255,255,255,0.12);
+      border: none;
+      color: #fff;
+      font-size: 1.4rem;
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .2s;
+    }
+    .lightbox-cerrar:hover { background: rgba(255,255,255,0.25); }
+    .card-img { cursor: zoom-in; }
 
     @media (max-width: 600px) {
       header { padding: 16px 18px; }
@@ -357,6 +394,16 @@
     });
 
     // Eventos
+    grid.querySelectorAll(".card-img").forEach(img => {
+      img.addEventListener("click", () => {
+        const lb = document.createElement("div");
+        lb.className = "lightbox";
+        lb.innerHTML = `<button class="lightbox-cerrar" title="Cerrar">✕</button><img src="${img.src}" alt="${img.alt}" />`;
+        lb.addEventListener("click", e => { if (e.target === lb || e.target.classList.contains("lightbox-cerrar")) lb.remove(); });
+        document.body.appendChild(lb);
+      });
+    });
+
     grid.querySelectorAll(".btn-copiar").forEach(btn => {
       btn.addEventListener("click", () => {
         navigator.clipboard.writeText(btn.dataset.url).then(() => {
